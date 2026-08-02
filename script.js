@@ -714,8 +714,10 @@ function playerTouchesFallingRock() {
 
 // Make each rock fall, then return it to the roof to fall again.
 function updateFallingRocks() {
+  // Higher worlds make rockfalls a little quicker without becoming unfair.
+  const rockfallSpeedMultiplier = 1 + (currentLevel - 1) * 0.12;
   for (const rock of activeFallingRocks) {
-    rock.velocityY += 0.18;
+    rock.velocityY += 0.18 * rockfallSpeedMultiplier;
     rock.y += rock.velocityY;
 
     if (rock.y + rock.size >= floor.y) {
