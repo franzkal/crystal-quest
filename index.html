@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crystal Quest</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game-page">
+      <h1>Crystal Quest</h1>
+      <p>Use the left and right arrow keys to move. Press Space to jump. Press Command to swing the pickaxe.</p>
+
+      <!-- The canvas is the drawing area for the game. -->
+      <canvas id="gameCanvas" width="1100" height="600">
+        Your browser does not support the HTML Canvas element.
+      </canvas>
+
+      <!-- This counter shows how many crystals the miner has collected. -->
+      <div id="crystalCounter">Crystals: 0</div>
+      <div id="levelMessage" aria-live="polite"></div>
+
+      <!-- The Option-key menu pauses the game and opens the upgrade shop. -->
+      <div id="menuOverlay" class="hidden">
+        <section class="menu-panel">
+          <div id="mainMenu">
+            <h2>Crystal Quest</h2>
+            <button id="openLevelsButton" type="button">Levels</button>
+            <button id="openShopButton" type="button">Shop</button>
+            <button id="resumeButton" type="button">Resume</button>
+          </div>
+
+          <div id="shopMenu" class="hidden">
+            <h2>Crystal Shop</h2>
+            <p id="shopMessage">Spend crystals to unlock new controls.</p>
+            <button class="upgrade-button" data-upgrade="doubleJump" type="button">Double Jump — 500</button>
+            <button class="upgrade-button" data-upgrade="climb" type="button">Platform Phase — 750</button>
+            <button class="upgrade-button" data-upgrade="dash" type="button">Dash — 400</button>
+            <button class="upgrade-button" data-upgrade="tripleMultiplier" type="button">Triple Crystal Round — 50</button>
+            <button id="backButton" type="button">Back</button>
+          </div>
+
+          <div id="levelsMenu" class="hidden">
+            <h2>Choose a Level</h2>
+            <button class="level-button" data-level="1" type="button">Level 1 — Crystal Cavern</button>
+            <button class="level-button" data-level="2" type="button">World 2 — Obsidian Depths</button>
+            <button class="level-button" data-level="3" type="button">World 3 — Azure Abyss</button>
+            <button id="levelsBackButton" type="button">Back</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- This button returns the player to the starting position. -->
+      <button id="restartButton" type="button">Restart</button>
+    </main>
+
+    <!-- JavaScript goes last so the page is ready before the game starts. -->
+    <script src="script.js"></script>
+  </body>
+</html>
