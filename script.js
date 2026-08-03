@@ -210,6 +210,28 @@ const levelThreeFallingRocks = [
   { x: 4380, y: roofY + 65, size: 24, velocityY: 0 },
 ];
 
+// World 4 is a volcanic finale with a few extra obstacles and safe stepping routes.
+const levelFourSpikes = [
+  ...levelThreeSpikes,
+  { x: 2390, width: 32, height: 28 },
+  { x: 4800, width: 34, height: 30 },
+];
+const levelFourAcidPools = [
+  ...levelThreeAcidPools,
+  { x: 2310, width: 55 },
+  { x: 4750, width: 55 },
+];
+const levelFourPlatforms = [
+  ...levelThreePlatforms,
+  { x: 2260, y: floor.y - 65, width: 100, height: 18 },
+  { x: 4690, y: floor.y - 68, width: 105, height: 18 },
+];
+const levelFourFallingRocks = [
+  ...levelThreeFallingRocks,
+  { x: 2390, y: roofY + 45, size: 25, velocityY: 0 },
+  { x: 4780, y: roofY + 30, size: 24, velocityY: 0 },
+];
+
 let currentLevel = 1;
 let activeFloorSpikes = floorSpikes;
 let activeAcidPools = acidPools;
@@ -253,6 +275,18 @@ const worldThemes = {
     spike: "#166078",
     door: "#075276",
     doorGlow: "#7cffff",
+  },
+  4: {
+    wall: "#3a1512",
+    roof: "#160403",
+    crack: "#ff9e3d",
+    floor: "#663328",
+    acid: "#ff4d18",
+    platform: "#8a4931",
+    fallingRock: "#d17a4e",
+    spike: "#713124",
+    door: "#782414",
+    doorGlow: "#ffd06a",
   },
 };
 
@@ -374,10 +408,10 @@ function showMenuScreen(screen) {
 // Switch the active layout, hazards, and platforms for the chosen level.
 function selectLevel(levelNumber) {
   currentLevel = levelNumber;
-  activeFloorSpikes = currentLevel === 3 ? levelThreeSpikes : currentLevel === 2 ? levelTwoSpikes : floorSpikes;
-  activeAcidPools = currentLevel === 3 ? levelThreeAcidPools : currentLevel === 2 ? levelTwoAcidPools : acidPools;
-  activePlatforms = currentLevel === 3 ? levelThreePlatforms : currentLevel === 2 ? levelTwoPlatforms : platforms;
-  activeFallingRocks = currentLevel === 3 ? levelThreeFallingRocks : currentLevel === 2 ? levelTwoFallingRocks : fallingRocks;
+  activeFloorSpikes = currentLevel === 4 ? levelFourSpikes : currentLevel === 3 ? levelThreeSpikes : currentLevel === 2 ? levelTwoSpikes : floorSpikes;
+  activeAcidPools = currentLevel === 4 ? levelFourAcidPools : currentLevel === 3 ? levelThreeAcidPools : currentLevel === 2 ? levelTwoAcidPools : acidPools;
+  activePlatforms = currentLevel === 4 ? levelFourPlatforms : currentLevel === 3 ? levelThreePlatforms : currentLevel === 2 ? levelTwoPlatforms : platforms;
+  activeFallingRocks = currentLevel === 4 ? levelFourFallingRocks : currentLevel === 3 ? levelThreeFallingRocks : currentLevel === 2 ? levelTwoFallingRocks : fallingRocks;
 
   for (const rock of activeFallingRocks) {
     rock.y = roofY + 12;
@@ -942,6 +976,30 @@ function drawCaveBackground() {
     context.globalAlpha = 1;
   }
 
+  // Ember Forge is a hot, volcanic chamber rather than another dark rock cave.
+  if (currentLevel === 4) {
+    const forgeGlow = context.createLinearGradient(0, roofY, 0, floor.y);
+    forgeGlow.addColorStop(0, "#1b0605");
+    forgeGlow.addColorStop(0.58, "#5c1c12");
+    forgeGlow.addColorStop(1, "#a33a1d");
+    context.fillStyle = forgeGlow;
+    context.fillRect(0, roofY, world.width, floor.y - roofY);
+
+    // Molten seams across the walls give this world a fiery identity.
+    context.strokeStyle = "#ff8b32";
+    context.lineWidth = 3;
+    for (let seamNumber = 2; seamNumber < wallCracks.length; seamNumber += 9) {
+      const seam = wallCracks[seamNumber];
+      context.globalAlpha = 0.55;
+      context.beginPath();
+      context.moveTo(seam.x, seam.y);
+      context.lineTo(seam.x + seam.direction * 18, seam.y + 20);
+      context.lineTo(seam.x - seam.direction * 9, seam.y + 48);
+      context.stroke();
+    }
+    context.globalAlpha = 1;
+  }
+
   // A dark roof sits much lower than the top of the map.
   context.fillStyle = theme.roof;
   context.fillRect(0, 0, world.width, roofY);
@@ -975,6 +1033,18 @@ function drawCaveBackground() {
     context.globalAlpha = 1;
   }
 
+  // Tiny rising embers make World 4 feel like a forge.
+  if (currentLevel === 4) {
+    context.fillStyle = "#ffd05a";
+    for (let emberNumber = 0; emberNumber < 42; emberNumber += 1) {
+      const x = (emberNumber * 271 + 70) % world.width;
+      const y = floor.y - 18 - ((emberNumber * 43 + animationTime * 0.7) % 210);
+      context.globalAlpha = 0.22 + (emberNumber % 4) * 0.1;
+      context.fillRect(x, y, 2, 2);
+    }
+    context.globalAlpha = 1;
+  }
+
   // The grey cave floor is lit wherever the flashlight reaches it.
   context.fillStyle = theme.floor;
   context.fillRect(floor.x, floor.y, floor.width, floor.height);
@@ -991,6 +1061,11 @@ function drawCaveBackground() {
     context.fillRect(platform.x, platform.y, platform.width, platform.height);
     if (currentLevel === 3) {
       context.fillStyle = "#89ffff";
+      context.fillRect(platform.x, platform.y, platform.width, 3);
+      context.fillStyle = theme.platform;
+    }
+    if (currentLevel === 4) {
+      context.fillStyle = "#ffba4f";
       context.fillRect(platform.x, platform.y, platform.width, 3);
       context.fillStyle = theme.platform;
     }
