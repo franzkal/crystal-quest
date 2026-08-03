@@ -391,8 +391,8 @@ const landingPebbles = [];
 let animationTime = 0;
 let levelStartedAt = performance.now();
 let levelCompleted = false;
-// Run the game simulation at a stable 60 updates each second on every display.
-const fixedUpdateMs = 1000 / 60;
+// Run at a stable, deliberately relaxed 30 updates each second on every display.
+const fixedUpdateMs = 1000 / 30;
 let previousFrameTime = null;
 let pendingUpdateTime = 0;
 
