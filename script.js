@@ -391,6 +391,10 @@ const landingPebbles = [];
 let animationTime = 0;
 let levelStartedAt = performance.now();
 let levelCompleted = false;
+// Run the game simulation at a stable 60 updates each second on every display.
+const fixedUpdateMs = 1000 / 60;
+let previousFrameTime = null;
+let pendingUpdateTime = 0;
 
 // Update the number shown in the top-right corner.
 function updateCrystalCounter() {
@@ -1359,18 +1363,26 @@ function drawGame() {
   context.restore();
 }
 
-// This loop updates the game and redraws it many times each second.
-function gameLoop() {
-  if (menuOpen) {
-    drawGame();
-    requestAnimationFrame(gameLoop);
-    return;
+// This loop draws as often as the display allows, but always simulates at 60 FPS.
+function gameLoop(frameTime) {
+  if (previousFrameTime === null) previousFrameTime = frameTime;
+  // Limit a long tab pause so returning to the game cannot cause a huge catch-up jump.
+  pendingUpdateTime += Math.min(frameTime - previousFrameTime, 100);
+  previousFrameTime = frameTime;
+
+  let updateCount = 0;
+  while (pendingUpdateTime >= fixedUpdateMs && !menuOpen && updateCount < 6) {
+    animationTime += 1;
+    updateFallingRocks();
+    updateLandingPebbles();
+    updateLooseCrystals();
+    updatePlayer();
+    pendingUpdateTime -= fixedUpdateMs;
+    updateCount += 1;
   }
-  animationTime += 1;
-  updateFallingRocks();
-  updateLandingPebbles();
-  updateLooseCrystals();
-  updatePlayer();
+  // Do not retain a large backlog when the game is paused in a menu.
+  if (menuOpen) pendingUpdateTime = 0;
+
   updateCamera();
   drawGame();
   requestAnimationFrame(gameLoop);
@@ -1380,4 +1392,4 @@ function gameLoop() {
 restartButton.addEventListener("click", restartGame);
 loadSavedProgress();
 restartGame();
-gameLoop();
+requestAnimationFrame(gameLoop);
