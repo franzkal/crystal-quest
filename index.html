@@ -20,6 +20,19 @@
       <div id="crystalCounter">Crystals: 0</div>
       <div id="levelMessage" aria-live="polite"></div>
 
+      <!-- Touch controls appear only on phones and other touch-first devices. -->
+      <div id="touchControls" aria-label="Mobile game controls">
+        <button id="touchMenuButton" class="touch-menu" type="button" aria-label="Open menu">☰</button>
+        <div class="touch-movement">
+          <button id="touchLeftButton" type="button" aria-label="Move left">◀</button>
+          <button id="touchRightButton" type="button" aria-label="Move right">▶</button>
+        </div>
+        <div class="touch-actions">
+          <button id="touchMineButton" type="button" aria-label="Mine with pickaxe">Mine</button>
+          <button id="touchJumpButton" type="button" aria-label="Jump">Jump</button>
+        </div>
+      </div>
+
       <!-- The Option-key menu pauses the game and opens the upgrade shop. -->
       <div id="menuOverlay" class="hidden">
         <section class="menu-panel">

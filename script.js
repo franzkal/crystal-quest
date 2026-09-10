@@ -16,6 +16,11 @@ const levelsBackButton = document.getElementById("levelsBackButton");
 const shopMessage = document.getElementById("shopMessage");
 const upgradeButtons = document.querySelectorAll(".upgrade-button");
 const levelButtons = document.querySelectorAll(".level-button");
+const touchMenuButton = document.getElementById("touchMenuButton");
+const touchLeftButton = document.getElementById("touchLeftButton");
+const touchRightButton = document.getElementById("touchRightButton");
+const touchJumpButton = document.getElementById("touchJumpButton");
+const touchMineButton = document.getElementById("touchMineButton");
 
 // The world is much larger than the visible canvas. The camera shows one part.
 const world = {
@@ -338,6 +343,8 @@ let tripleMultiplierActive = false;
 
 // Save progress in the browser so deaths and reloads do not erase crystals.
 const progressVersion = "powers-reset-1";
+// Use this once to remove owned abilities while keeping every shop item buyable.
+const removedUpgradeVersion = "remove-all-upgrades-1";
 function loadSavedProgress() {
   try {
     // This version resets old saved powers and crystals once, but keeps the shop available.
@@ -347,6 +354,7 @@ function loadSavedProgress() {
         upgrades[name].owned = false;
       }
       localStorage.setItem("crystalQuestProgressVersion", progressVersion);
+      localStorage.setItem("crystalQuestRemovedUpgradeVersion", removedUpgradeVersion);
       saveProgress();
       return;
     }
@@ -355,6 +363,16 @@ function loadSavedProgress() {
     const savedUpgrades = JSON.parse(localStorage.getItem("crystalQuestUpgrades") || "{}");
     for (const name of Object.keys(upgrades)) {
       upgrades[name].owned = savedUpgrades[name] === true;
+    }
+
+    // Remove all currently owned powers one time only.
+    // The shop entries remain available and can be purchased again later.
+    if (localStorage.getItem("crystalQuestRemovedUpgradeVersion") !== removedUpgradeVersion) {
+      for (const name of Object.keys(upgrades)) {
+        upgrades[name].owned = false;
+      }
+      localStorage.setItem("crystalQuestRemovedUpgradeVersion", removedUpgradeVersion);
+      saveProgress();
     }
   } catch {
     // The game still works if the browser does not allow local storage.
@@ -527,6 +545,21 @@ const keys = {
   ArrowRight: false,
 };
 
+// Start a jump for either the keyboard Space key or the mobile Jump button.
+function tryJump() {
+  const wasPreparingJump = player.jumpPrepareTimer > 0;
+  if (player.isOnGround && player.jumpPrepareTimer === 0) {
+    player.jumpPrepareTimer = 6;
+  }
+  if (upgrades.doubleJump.owned && wasPreparingJump) {
+    player.doubleJumpQueued = true;
+  }
+  if (upgrades.doubleJump.owned && !player.isOnGround && player.airJumps === 0) {
+    player.velocityY = jumpStrength;
+    player.airJumps = 1;
+  }
+}
+
 // Listen for a key being pressed.
 window.addEventListener("keydown", (event) => {
   // Option opens or closes the pause menu.
@@ -554,30 +587,41 @@ window.addEventListener("keydown", (event) => {
     player.pickaxeSwing = 16;
   }
 
-  const wasPreparingJump = player.jumpPrepareTimer > 0;
-
-  // Only allow a jump when the player is standing on the floor.
-  if (event.code === "Space" && player.isOnGround && player.jumpPrepareTimer === 0) {
-    // A tiny crouch makes the jump feel more physical before takeoff.
-    player.jumpPrepareTimer = 6;
-  }
-
-  // A second quick Space press during the crouch queues the double jump.
-  if (event.code === "Space" && upgrades.doubleJump.owned && wasPreparingJump) {
-    player.doubleJumpQueued = true;
-  }
-
-  // A second Space press while airborne triggers the purchased double jump.
-  if (event.code === "Space" && upgrades.doubleJump.owned && !player.isOnGround && player.airJumps === 0) {
-    player.velocityY = jumpStrength;
-    player.airJumps = 1;
-  }
+  if (event.code === "Space") tryJump();
 });
 
 // Listen for a key being released.
 window.addEventListener("keyup", (event) => {
   if (event.code === "ArrowLeft") keys.ArrowLeft = false;
   if (event.code === "ArrowRight") keys.ArrowRight = false;
+});
+
+// Hold an on-screen arrow to move. Pointer events cover phones and tablets.
+function bindTouchMovement(button, keyName) {
+  const startMoving = (event) => {
+    event.preventDefault();
+    keys[keyName] = true;
+  };
+  const stopMoving = (event) => {
+    event.preventDefault();
+    keys[keyName] = false;
+  };
+  button.addEventListener("pointerdown", startMoving);
+  button.addEventListener("pointerup", stopMoving);
+  button.addEventListener("pointercancel", stopMoving);
+  button.addEventListener("pointerleave", stopMoving);
+}
+
+bindTouchMovement(touchLeftButton, "ArrowLeft");
+bindTouchMovement(touchRightButton, "ArrowRight");
+touchMenuButton.addEventListener("click", toggleMenu);
+touchJumpButton.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  if (!menuOpen) tryJump();
+});
+touchMineButton.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  if (!menuOpen) player.pickaxeSwing = 16;
 });
 
 // Put the player back at the starting position.

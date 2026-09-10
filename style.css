@@ -51,6 +51,7 @@ body {
 #menuOverlay {
   position: fixed;
   inset: 0;
+  z-index: 3;
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.72);
@@ -104,4 +105,88 @@ button {
 
 button:hover {
   background: #0f548a;
+}
+
+/* Desktop keeps its clean keyboard layout; touch controls are phone-only. */
+#touchControls {
+  display: none;
+}
+
+@media (pointer: coarse), (max-width: 700px) {
+  body {
+    display: block;
+    overflow: hidden;
+  }
+
+  .game-page {
+    padding: 8px;
+  }
+
+  .game-page h1,
+  .game-page > p,
+  #restartButton {
+    display: none;
+  }
+
+  canvas {
+    width: 100%;
+    margin: 0 auto;
+    border-width: 2px;
+  }
+
+  #crystalCounter {
+    top: 12px;
+    right: 12px;
+    padding: 7px 10px;
+    font-size: 0.85rem;
+  }
+
+  #touchControls {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  #touchControls button {
+    min-width: 64px;
+    min-height: 58px;
+    padding: 8px 12px;
+    border: 2px solid rgba(183, 103, 255, 0.8);
+    border-radius: 14px;
+    background: rgba(22, 16, 36, 0.86);
+    color: #f2dcff;
+    font-weight: bold;
+    font-size: 1rem;
+    touch-action: none;
+    user-select: none;
+    pointer-events: auto;
+  }
+
+  .touch-menu {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+  }
+
+  .touch-movement,
+  .touch-actions {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    gap: 10px;
+  }
+
+  .touch-movement {
+    left: 16px;
+  }
+
+  .touch-actions {
+    right: 16px;
+  }
+
+  #touchMineButton {
+    font-size: 0.8rem;
+  }
 }
