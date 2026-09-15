@@ -253,7 +253,7 @@ const worldThemes = {
     acid: "#4dce6f",
     platform: "#59616c",
     fallingRock: "#8b929c",
-    spike: "#434a55",
+    spike: "#78899d",
     door: "#39275a",
     doorGlow: "#b767ff",
   },
@@ -265,7 +265,7 @@ const worldThemes = {
     acid: "#ff7b35",
     platform: "#62506e",
     fallingRock: "#a178a8",
-    spike: "#5a3949",
+    spike: "#a46378",
     door: "#57233b",
     doorGlow: "#ff9a52",
   },
@@ -277,7 +277,7 @@ const worldThemes = {
     acid: "#48fff1",
     platform: "#1d7791",
     fallingRock: "#54bad2",
-    spike: "#166078",
+    spike: "#35a8c7",
     door: "#075276",
     doorGlow: "#7cffff",
   },
@@ -289,7 +289,7 @@ const worldThemes = {
     acid: "#ff4d18",
     platform: "#8a4931",
     fallingRock: "#d17a4e",
-    spike: "#713124",
+    spike: "#d85b39",
     door: "#782414",
     doorGlow: "#ffd06a",
   },
@@ -1184,6 +1184,14 @@ function drawCaveBackground() {
     context.lineTo(spike.x + spike.width, floor.y);
     context.closePath();
     context.fill();
+
+    // A bright ridge makes every dangerous point easy to see in the dark cave.
+    context.strokeStyle = "rgba(255, 255, 255, 0.48)";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(spike.x + 3, floor.y - 2);
+    context.lineTo(spike.x + spike.width / 2, floor.y - spike.height + 2);
+    context.stroke();
   }
 
   // Glowing crystals gently grow and dim to create a twinkling effect.
