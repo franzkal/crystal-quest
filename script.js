@@ -374,6 +374,10 @@ function loadSavedProgress() {
       localStorage.setItem("crystalQuestRemovedUpgradeVersion", removedUpgradeVersion);
       saveProgress();
     }
+
+    // Testing build bonus: Dash is always unlocked for free.
+    upgrades.dash.owned = true;
+    saveProgress();
   } catch {
     // The game still works if the browser does not allow local storage.
   }
@@ -580,7 +584,7 @@ window.addEventListener("keydown", (event) => {
   if (event.code === "ArrowRight") keys.ArrowRight = true;
 
   if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
-    if (upgrades.dash.owned && player.isOnGround) player.dashTimer = 8;
+    if (upgrades.dash.owned) player.dashTimer = 8;
   }
   // Press either Command key to start a short pickaxe swing.
   if (event.code === "MetaLeft" || event.code === "MetaRight") {
@@ -894,7 +898,7 @@ function updatePlayer() {
   }
 
   // Dash moves the miner farther in the direction they are facing.
-  if (player.dashTimer > 0 && player.isOnGround) {
+  if (player.dashTimer > 0) {
     player.x += player.direction * 10;
     player.dashTimer -= 1;
   }
@@ -911,7 +915,6 @@ function updatePlayer() {
   player.velocityY += gravity;
   player.y += player.velocityY;
   const landingSpeed = player.velocityY;
-  if (!player.isOnGround) player.dashTimer = 0;
 
   // When jumping upward, stop the player at the underside of a platform.
   if (player.velocityY < 0 && !upgrades.climb.owned) {
